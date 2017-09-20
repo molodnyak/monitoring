@@ -1,14 +1,13 @@
-library("XML")
-baseurl <- "http://indicators.miccedu.ru/monitoring/_vpo/inst.php?id="
-#2017
+### LINKS ###
+#2017 HSE
 "http://indicators.miccedu.ru/monitoring/_vpo/inst.php?id=1766"
-#2016
+#2016 HSE
 "http://indicators.miccedu.ru/monitoring/2016/_vpo/inst.php?id=1766"
-#2015
+#2015 HSE
 "http://indicators.miccedu.ru/monitoring/2015/inst.php?id=1766"
-#2014
+#2014 HSE
 "https://miccedu.ru/monitoring/2014/materials/inst_1766.htm"
-#2013
+#2013 HSE
 "https://miccedu.ru/monitoring/2013/materials/inst_1766.htm"
 
 ########################### 2016 ############ 2017 ###########################
@@ -444,12 +443,7 @@ info <- data.frame("id"=id, "year"=2013, "vuz"=names(x)[2], "reg"=trimws(gsub('.
                    "rez"=ifelse(length(x[2][x[1]=='Результат оценки эффективности деятельности'])==0, 
                                 '',x[2][x[1]=='Результат оценки эффективности деятельности']), 
                    stringsAsFactors = F)
-#x[2][x[1]=='Категория организации'] -- 1 - национальный исследовательский университет
-#x[2][x[1]=='Организационно-правовая форма'] -- 1 - автономное учреждение
 
-#x <- vuz[2][[1]] -- Список филиалов
-#Encoding(names(x)) <- "UTF-8"
-#Encoding(x[,1]) <- "UTF-8"
 
 #---------------II. Сведения по показателям мониторинга эффективности деятельности--------------
 
@@ -623,12 +617,7 @@ for (id in idmon){
                          "rez"=ifelse(length(x[2][x[1]=='Результат оценки эффективности деятельности'])==0, 
                                       '',x[2][x[1]=='Результат оценки эффективности деятельности']), 
                          stringsAsFactors = F)
-      #x[2][x[1]=='Категория организации'] -- 1 - национальный исследовательский университет
-      #x[2][x[1]=='Организационно-правовая форма'] -- 1 - автономное учреждение
-      
-      #x <- vuz[2][[1]] -- Список филиалов
-      #Encoding(names(x)) <- "UTF-8"
-      #Encoding(x[,1]) <- "UTF-8"
+
       
       #---------------II. Сведения по показателям мониторинга эффективности деятельности--------------
       
@@ -877,8 +866,6 @@ mon$variable[mon$variable == 'Численность студентов, при�
 
 #Reshape
 monrr <- mon[, !colnames(mon) %in% c('group', 'domain', 'ugns', 'index', 'unit', 'threshold', 'change', 'last')]
-  ##Филиалы (-4)
-  monrr <- monrr[!monrr$id %in% c('1573', '1809', '1811', '1813'), ]
 monrr <- reshape(monrr, idvar = c('id', 'year', 'V5100', 'Vniu', 'Vvu', 'vuz', 'reg', 'ind', 'adr', 'rec', 'ved', 'web', 'dir', 'org', 'rez'), timevar = "variable", direction = "wide")
 names(monrr) <- gsub('value.', '', names(monrr))
 write.table(monrr, file="D:/R/Monitoring/monitoring.reshape.csv", row.names = F, col.names = T, sep = ";")
@@ -891,18 +878,13 @@ write.table(monrr, file="D:/R/Monitoring/monitoring.reshape.csv", row.names = F,
 
 #SPSS
 monrr <- data.frame('id' = mon$id, 'yvariable' = paste(mon$year, mon$variable, sep = '.'), 'value' = mon$value)
-  ##Филиалы (-4)
-  monrr <- monrr[!monrr$id %in% c('1573', '1809', '1811', '1813'), ]
 monrr <- reshape(monrr, idvar = "id", timevar = "yvariable", direction = "wide")
 names(monrr) <- gsub('value.', '', names(monrr))
 write.table(monrr, file="D:/R/Monitoring/monitoring.spss.csv", row.names = F, col.names = T, sep = ";")
 #SPSS
 
 #SAVE
-  ##Филиалы (-4)
-  mon <- mon[!mon$id %in% c('1573', '1809', '1811', '1813'), ]
 write.table(mon, file="D:/R/Monitoring/monitoring.csv", row.names = F, col.names = T, sep = ";", fileEncoding = "UTF-8")
-
 saveRDS(mon, file = "D:/R/Monitoring/mon.Rds")
 saveRDS(v, file = "D:/R/Monitoring/v.Rds")
 
@@ -996,8 +978,6 @@ x <- data.frame("index"=c('E.2', '2.10','2.7','2.8','2.16'), "Vname"=c('Объе
 DF <- merge(DF, x, by = "index")
 DF$Vgroup <- 'НИОКР'
 v <- rbind(v, DF)
-
-##Расчетный показатель !! >>
 
 #Публикации -------------------------------------> 
 ##5-100
@@ -1247,11 +1227,10 @@ for (i in 4:6){
                        #"chdls=404040,13", "&", ## Формат подписей легенды
                        "chma=0,0,70,0", "&", ## Отступы
                        "chdlp=b") ## Положение легенды ## "b"(bottom),"t"(top),"l"(left),"r"(right),"bv"/"tv"(vertical order) "bvs"-пропуск пустой легенды
-    download.file(chartapi, paste0("D:/R/Monitoring/chartapi.", i, '-', j,  ".png"), mode = 'wb')
+    download.file(chartapi, paste0("Monitoring/chartapi.", i, '-', j,  ".png"), mode = 'wb')
     message("Google Chart API for ", unique(v$Vgroup)[j], " - ", ifelse(i==4,'5-100',ifelse(i==5,'НИУ','ВУ')))
   }
 }
-
 
 ##############################################################################################################################
 ##############################################################################################################################
